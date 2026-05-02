@@ -1,0 +1,85 @@
+*.iml
+.gradle
+/local.properties
+gradle.properties.local
+buildSrc/.kotlin/
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+github.properties
+.kiro
+.kilocode
+mihon-main
+lnreader-master
+IReader-extensions
+# Gradle files
+.gradle/
+build/
+CONTINUITY.md
+
+# Log/OS Files
+*.log
+
+# Android Studio generated files and folders
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+output.json
+
+# IntelliJ
+.idea/
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
+
+# Keystore files
+*.jks
+*.keystore
+
+# Android Profiling
+*.hprof
+/.kotlin
+
+# Native libraries (should be downloaded/built by developers)
+native/libs/
+native/piper/
+*.dll
+*.so
+*.dylib
+
+# Downloaded voice models
+voice_models/
+*.onnx
+*.onnx.json
+
+# Build artifacts
+native/build/
+native/cmake-build-*/
+
+# Binary files and compiled outputs
+bin/
+*.class
+*.dex
+*.ap_
+*.aab
+
+# Supabase configuration files (contain sensitive credentials)
+config.properties
+IReader-plugins
+legado-master
+ksuop
+Suwayomi-Server-master
+mihon
+extensions-source-main
+lnreader-plugins-unminified

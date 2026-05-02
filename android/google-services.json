@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "927826490201",
+    "project_id": "infinity-reader",
+    "storage_bucket": "infinity-reader.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:927826490201:android:fa37cc7f8a9d99fedd5248",
+        "android_client_info": {
+          "package_name": "ir.kazemcodes.infinityreader"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWQvmx_sx0hY3wnLawcEwddVegbgmQawo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:927826490201:android:4687fd98e5a7d92fdd5248",
+        "android_client_info": {
+          "package_name": "ir.kazemcodes.infinityreader.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWQvmx_sx0hY3wnLawcEwddVegbgmQawo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:927826490201:android:c6210194df9b45ccdd5248",
+        "android_client_info": {
+          "package_name": "ir.kazemcodes.infinityreader.preview"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWQvmx_sx0hY3wnLawcEwddVegbgmQawo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

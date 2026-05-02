@@ -1,0 +1,153 @@
+package ireader.presentation.ui.home.library.ui
+
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import ireader.domain.models.entities.BookItem
+import ireader.presentation.ui.home.library.components.ScrollableTabs
+import ireader.presentation.ui.home.library.components.visibleName
+import ireader.presentation.ui.home.library.viewmodel.LibraryViewModel
+import ireader.presentation.ui.home.library.viewmodel.PaginationState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.StateFlow
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+internal fun LibraryContent(
+        vm: LibraryViewModel,
+        onBook: (book: BookItem) -> Unit,
+        onLongBook: (book: BookItem) -> Unit,
+        goToLatestChapter: (book: BookItem) -> Unit,
+        onPageChanged: (Int) -> Unit,
+        getColumnsForOrientation: CoroutineScope.(Boolean) -> StateFlow<Int>,
+        onResumeReading: () -> Unit,
+) {
+    // Collect state reactively
+    val state by vm.state.collectAsState()
+    val categories = state.categories
+    val selectedCategoryIndex = state.selectedCategoryIndex
+    val selectedBooks = state.selectedBookIds
+    val layout = state.layout
+    val isLoading = state.isLoading
+    val inSearchMode = state.inSearchMode
+    val searchBooks = state.books // This contains search results when in search mode
+    
+    // Early return for empty categories when not in search mode
+    val hasCategories = remember(categories) { categories.isNotEmpty() }
+    if (!hasCategories && !inSearchMode) return
+    
+    // Show search results when in search mode
+    if (inSearchMode) {
+        // Convert LibraryBook to BookItem for display
+        val searchBookItems = remember(searchBooks) {
+            searchBooks.map { it.toBookItem() }
+        }
+        
+        LibrarySearchResults(
+            books = searchBookItems,
+            layout = layout,
+            selection = selectedBooks.toList(),
+            onClick = onBook,
+            onLongClick = onLongBook,
+            goToLatestChapter = goToLatestChapter,
+            showUnreadBadge = vm.unreadBadge.value,
+            showReadBadge = vm.readBadge.value,
+            showGoToLastChapterBadge = vm.goToLastChapterBadge.value,
+            getColumnsForOrientation = getColumnsForOrientation,
+            columnsInPortrait = state.columnsInPortrait,
+            columnsInLandscape = state.columnsInLandscape
+        )
+        return
+    }
+    
+    val horizontalPager =
+        rememberPagerState(
+            initialPage = selectedCategoryIndex,
+            initialPageOffsetFraction = 0f
+        ) {
+            categories.size
+        }
+    LaunchedEffect(horizontalPager) {
+        snapshotFlow { horizontalPager.currentPage }.collect {
+            onPageChanged(it)
+        }
+    }
+
+    // Get books for the current category (not a delegate, just a value)
+    val currentCategoryBooks = remember(selectedCategoryIndex, state.books) {
+        vm.getLibraryForCategoryIndex(categoryIndex = selectedCategoryIndex)
+    }
+    
+    androidx.compose.foundation.layout.Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Show loading screen (hides tabs too)
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+//                LoadingScreen()
+            }
+        } else {
+            // Show tabs only when not loading
+            ScrollableTabs(
+                modifier = Modifier.fillMaxWidth(),
+                libraryTabs = categories
+                    .map { it.visibleName.plus(if (vm.showCountInCategory.value) " (${it.bookCount})" else "") },
+                pagerState = horizontalPager,
+                visible = vm.showCategoryTabs.value && categories.isNotEmpty()
+            )
+            
+            LibraryPager(
+                pagerState = horizontalPager,
+                onClick = onBook,
+                onLongClick = onLongBook,
+                goToLatestChapter = goToLatestChapter,
+                categories = categories,
+                pageCount = categories.size,
+                layout = layout,
+                onPageChange = { page ->
+                    // Return books for the page as State<List<BookItem>>
+                    vm.getLibraryForCategoryIndexAsState(categoryIndex = page)
+                },
+                selection = selectedBooks.toList(),
+                currentPage = selectedCategoryIndex,
+                showUnreadBadge = vm.unreadBadge.value,
+                showReadBadge = vm.readBadge.value,
+                showGoToLastChapterBadge = vm.goToLastChapterBadge.value,
+                showDownloadedChaptersBadge = vm.showDownloadedChaptersBadge.value,
+                showUnreadChaptersBadge = vm.showUnreadChaptersBadge.value,
+                showLocalMangaBadge = vm.showLocalMangaBadge.value,
+                showLanguageBadge = vm.showLanguageBadge.value,
+                getColumnsForOrientation = getColumnsForOrientation,
+                columnsInPortrait = state.columnsInPortrait,
+                columnsInLandscape = state.columnsInLandscape,
+                onSaveScrollPosition = { categoryId, index, offset ->
+                    vm.saveScrollPosition(categoryId, index, offset)
+                },
+                getScrollPosition = { categoryId ->
+                    vm.getScrollPosition(categoryId)
+                },
+                // Pagination callbacks
+                onLoadMore = { categoryId ->
+                    vm.loadMoreBooks(categoryId)
+                },
+                getPaginationState = { categoryId ->
+                    vm.getPaginationState(categoryId)
+                }
+            )
+        }
+    }
+}
